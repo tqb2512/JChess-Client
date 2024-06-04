@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Bishop extends Piece {
     public Bishop(String color) {
         super("Bishop", color);
-        image = loadSVGImage(STR."/pieces/\{color.equals("white") ? "w" : "b"}-bishop.svg");
+        image = loadSVGImage(color.equals("white") ? "/pieces/w-bishop.svg" : "/pieces/b-bishop.svg");
     }
 
     @Override

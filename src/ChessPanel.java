@@ -1,8 +1,11 @@
+import model.Game;
 import model.piece.Piece;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChessPanel extends JPanel implements Runnable {
 
@@ -12,11 +15,17 @@ public class ChessPanel extends JPanel implements Runnable {
     final int HEIGHT = 8;
 
     ArrayList<int[][]> validMoves;
-    WebSocketConnection webSocketConnection;
+    GameSocketConnection webSocketConnection;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public ChessPanel() {
-        setFocusable(true);
-        requestFocus();
+    public ChessPanel(Game game, GameSocketConnection webSocketConnection) {
+        setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
+        this.webSocketConnection = webSocketConnection;
+    }
+
+    public void start() {
+        executorService.submit(this);
     }
 
     public void paintComponent(Graphics g) {
@@ -68,13 +77,8 @@ public class ChessPanel extends JPanel implements Runnable {
             try {
                 Thread.sleep(1000 / FPS);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
-
-    public void connectToWebSocket(Game game) {
-        webSocketConnection.connect();
-    }
-
 }

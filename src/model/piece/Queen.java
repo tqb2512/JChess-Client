@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Queen extends Piece {
     public Queen(String color) {
         super("Queen", color);
-        image = loadSVGImage(STR."/pieces/\{color.equals("white") ? "w" : "b"}-queen.svg");
+        image = loadSVGImage(color.equals("white") ? "/pieces/w-queen.svg" : "/pieces/b-queen.svg");
     }
 
     @Override

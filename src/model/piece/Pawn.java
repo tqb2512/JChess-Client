@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Pawn extends Piece {
     public Pawn(String color) {
         super("Pawn", color);
-        image = loadSVGImage(STR."/pieces/\{color.equals("white") ? "w" : "b"}-pawn.svg");
+        image = loadSVGImage(color.equals("white") ? "/pieces/w-pawn.svg" : "/pieces/b-pawn.svg");
     }
 
     @Override

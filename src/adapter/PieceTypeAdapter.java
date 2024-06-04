@@ -40,7 +40,7 @@ public class PieceTypeAdapter extends TypeAdapter<Piece> {
             case "queen" -> new Queen(pieceColor);
             case "king" -> new King(pieceColor);
             case "pawn" -> new Pawn(pieceColor);
-            default -> throw new JsonParseException(STR."Unknown piece type: \{pieceName}");
+            default -> throw new JsonParseException("Invalid piece name: " + pieceName);
         };
     }
 }

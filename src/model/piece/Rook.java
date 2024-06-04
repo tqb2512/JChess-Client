@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Rook extends Piece {
     public Rook(String color) {
         super("Rook", color);
-        image = loadSVGImage(STR."/pieces/\{color.equals("white") ? "w" : "b"}-rook.svg");
+        image = loadSVGImage(color.equals("white") ? "/pieces/w-rook.svg" : "/pieces/b-rook.svg");
     }
     @Override
     public ArrayList<int[][]> getValidMoves(int currentCol, int currentRow, Board board) {

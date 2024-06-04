@@ -1,6 +1,7 @@
 package model.piece;
 
 import lombok.Getter;
+import lombok.Setter;
 import model.Board;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -14,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
 @Getter
+@Setter
 public abstract class Piece {
     private final String name;
     private final String color;
