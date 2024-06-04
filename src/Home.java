@@ -59,7 +59,7 @@ public class Home extends JFrame {
                                     .create();
                             Game game = gson.fromJson(response.body(), Game.class);
                             dispose();
-                            new GameForm(game);
+                            new GameForm(game, user);
                         } catch (Exception exception) {
                             JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
                         }
@@ -83,7 +83,7 @@ public class Home extends JFrame {
                         .create();
                 Game game = gson.fromJson(response.body(), Game.class);
                 dispose();
-                new GameForm(game);
+                new GameForm(game, user);
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
             }

@@ -1,8 +1,15 @@
 import model.Game;
+import model.GameStatus;
+import model.Square;
+import model.User;
 import model.piece.Piece;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,15 +20,28 @@ public class ChessPanel extends JPanel implements Runnable {
     final int TILE_SIZE = 70;
     final int WIDTH = 8;
     final int HEIGHT = 8;
+    final String GAME_URL = "http://localhost:8080/game";
 
+    Mouse mouse = new Mouse();
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    User player;
+    String color;
+    Square selectedSquare;
     ArrayList<int[][]> validMoves;
-    GameSocketConnection webSocketConnection;
+
+    GameSocketConnection GameSocket;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public ChessPanel(Game game, GameSocketConnection webSocketConnection) {
+    public ChessPanel(User player, GameSocketConnection GameSocket) {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
-        this.webSocketConnection = webSocketConnection;
+        this.GameSocket = GameSocket;
+        this.player = player;
+        this.color = player.getUsername().equals(GameSocket.game.getPlayer1().getUsername()) ? "white" : "black";
+        addMouseListener(mouse);
+        addMouseMotionListener(mouse);
+        start();
     }
 
     public void start() {
@@ -53,7 +73,7 @@ public class ChessPanel extends JPanel implements Runnable {
     public void drawPieces(Graphics2D g) {
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
-                Piece piece = webSocketConnection.game.getBoard().getPiece(col, row);
+                Piece piece = GameSocket.game.getBoard().getPiece(col, row);
                 if (piece != null) {
                     g.drawImage(piece.image, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
                 }
@@ -70,9 +90,50 @@ public class ChessPanel extends JPanel implements Runnable {
         }
     }
 
+    private void update() {
+        if (mouse.pressed) {
+            int col = mouse.x / TILE_SIZE;
+            int row = mouse.y / TILE_SIZE;
+            if (GameSocket.game.getStatus().equals(GameStatus.IN_PROGRESS)) {
+                if (GameSocket.game.getCurrentPlayer().getUsername().equals(player.getUsername())) {
+                    if (selectedSquare == null && GameSocket.game.getBoard().getPiece(col, row) != null && GameSocket.game.getBoard().getPiece(col, row).getColor().equals(color)){
+                        selectedSquare = GameSocket.game.getBoard().getSquare(col, row);
+                        validMoves = GameSocket.game.getValidMoves(col, row);
+                    } else if (selectedSquare != null && validMoves != null) {
+                        if (validMoves.stream().anyMatch(move -> move[0][0] == col && move[0][1] == row)) {
+                            movePiece(col, row);
+                        }
+                        selectedSquare = null;
+                        validMoves = null;
+                    } else {
+                        selectedSquare = null;
+                        validMoves = null;
+                    }
+                }
+            }
+            mouse.pressed = false;
+        }
+
+    }
+
+    private void movePiece(int col, int row) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(GAME_URL + "/move?gameId=" + GameSocket.game.getId() + "&selectCol=" + selectedSquare.getX() + "&selectRow=" + selectedSquare.getY() + "&targetCol=" + col + "&targetRow=" + row))
+                .header("Content-Type", "application/json")
+                .build();
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            selectedSquare = null;
+            validMoves = null;
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+        }
+    }
+
     @Override
     public void run() {
         while (true) {
+            update();
             repaint();
             try {
                 Thread.sleep(1000 / FPS);
