@@ -4,11 +4,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dto.GameListResponse;
 import model.Game;
+import model.GameStatus;
 import model.User;
 import model.piece.Piece;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,6 +33,10 @@ public class Home extends JFrame {
 
     public Home(String signedInUser) {
         this.signedInUser = signedInUser;
+        this.setTitle("Room List");
+        setPreferredSize(new Dimension(500, 600));
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
         setContentPane(HomePanel);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,30 +50,49 @@ public class Home extends JFrame {
                 int col = roomTable.columnAtPoint(evt.getPoint());
                 if (row >= 0 && col >= 0) {
                     String gameId = roomTable.getModel().getValueAt(row, 0).toString();
-                    int confirm = JOptionPane.showConfirmDialog(null, "Do you want to join this room?", "Join Room Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        User user = getSignedInUser();
-                        HttpRequest request = HttpRequest.newBuilder()
-                                .uri(URI.create(GAME_URL + "/joinRoom?gameId=" + gameId))
-                                .header("Content-Type", "application/json")
-                                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user)))
-                                .build();
-                        try {
-                            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                            Gson gson = new GsonBuilder()
-                                    .registerTypeAdapter(Piece.class, new PieceTypeAdapter())
-                                    .create();
-                            Game game = gson.fromJson(response.body(), Game.class);
-                            dispose();
-                            new GameForm(game, user);
-                        } catch (Exception exception) {
-                            JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                    if (roomTable.getModel().getValueAt(row, 3).equals(GameStatus.WAITING_FOR_PLAYER)) {
+                        int confirm = JOptionPane.showConfirmDialog(null, "Do you want to join this room?", "Join Room Confirmation", JOptionPane.YES_NO_OPTION);
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            User user = getSignedInUser();
+                            HttpRequest request = HttpRequest.newBuilder()
+                                    .uri(URI.create(GAME_URL + "/joinRoom?gameId=" + gameId))
+                                    .header("Content-Type", "application/json")
+                                    .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user)))
+                                    .build();
+                            try {
+                                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                                Gson gson = new GsonBuilder()
+                                        .registerTypeAdapter(Piece.class, new PieceTypeAdapter())
+                                        .create();
+                                Game game = gson.fromJson(response.body(), Game.class);
+                                dispose();
+                                new GameForm(game, user);
+                            } catch (Exception exception) {
+                                JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                            }
+                        }
+                    } else {
+                        int confirm = JOptionPane.showConfirmDialog(null, "Do you want to spectate this room?", "Spectate Room Confirmation", JOptionPane.YES_NO_OPTION);
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            HttpRequest request = HttpRequest.newBuilder()
+                                    .uri(URI.create(GAME_URL + "/getRoom?gameId=" + gameId))
+                                    .build();
+                            try {
+                                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                                Gson gson = new GsonBuilder()
+                                        .registerTypeAdapter(Piece.class, new PieceTypeAdapter())
+                                        .create();
+                                Game game = gson.fromJson(response.body(), Game.class);
+                                dispose();
+                                new GameForm(game, getSignedInUser());
+                            } catch (Exception exception) {
+                                JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                            }
                         }
                     }
                 }
             }
-        }
-        );
+        });
 
         createRoomButton.addActionListener(e -> {
             User user = getSignedInUser();

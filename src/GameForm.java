@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import model.Game;
+import model.GameStatus;
 import model.User;
 
 import javax.swing.*;
@@ -20,19 +21,23 @@ public class GameForm extends JFrame{
     private JButton sendChatButton;
     private JPanel GamePanel;
     public JLabel turnLabel;
+    private JButton leaveButton;
 
-    private final User signedInUser;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     final private String GAME_URL = "http://localhost:8080/game";
     final private String CHAT_URL = "http://localhost:8080/chat";
+    public User signedInUser;
     final private Game game;
     private GameSocketConnection GameSocket;
     private ChatSocketConnection ChatSocket;
 
     public GameForm(Game game, User signedInUser) {
-        this.signedInUser = signedInUser;
         connectToChatSocket(game);
         connectToGameSocket(game);
+        this.setTitle("GameID: " + game.getId() + " - " + signedInUser.getUsername());
+        setPreferredSize(new Dimension(900, 660));
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
         ChessPanel chessPanel = new ChessPanel(signedInUser, GameSocket);
         GridLayout gridLayout = new GridLayout(1, 2);
         boardPanel.setLayout(gridLayout);
@@ -48,16 +53,65 @@ public class GameForm extends JFrame{
         turnLabel.setText(game.getCurrentPlayer() != null ? game.getCurrentPlayer().getUsername() + "'s turn" : "Game has not started yet");
 
         sendChatButton.addActionListener(e -> {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(CHAT_URL + "/send?roomId=" + game.getId() + "&message=" + URLEncoder.encode(chatField.getText(), StandardCharsets.UTF_8)))
-                    .header("Content-Type", "application/json")
-                    .POST(signedInUser != null ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(signedInUser)) : HttpRequest.BodyPublishers.noBody())
-                    .build();
-            try {
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                chatField.setText("");
-            } catch (Exception exception) {
-                JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+            if (chatField.getText().isEmpty()) {
+                return;
+            }
+            if (GameSocket.game.getPlayer1().getUsername().equals(signedInUser.getUsername()) || GameSocket.game.getPlayer2().getUsername().equals(signedInUser.getUsername())) {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(CHAT_URL + "/send?roomId=" + game.getId() + "&message=" + URLEncoder.encode(chatField.getText(), StandardCharsets.UTF_8)))
+                        .header("Content-Type", "application/json")
+                        .POST(signedInUser != null ? HttpRequest.BodyPublishers.ofString(new Gson().toJson(signedInUser)) : HttpRequest.BodyPublishers.noBody())
+                        .build();
+                try {
+                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    chatField.setText("");
+                } catch (Exception exception) {
+                    JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Spectator cannot send chat");
+            }
+        });
+
+        leaveButton.addActionListener(e -> {
+            if (GameSocket.game.getPlayer1() == signedInUser || GameSocket.game.getPlayer2() == signedInUser) {
+                if (GameSocket.game.getStatus().equals(GameStatus.IN_PROGRESS)) {
+                    int confirm = JOptionPane.showConfirmDialog(null, "Leave a match in progress will count as lose. Do you want to leave?", "Leave Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(GAME_URL + "/leave?gameId=" + game.getId()))
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(signedInUser)))
+                                .build();
+                        try {
+                            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                            dispose();
+                        } catch (Exception exception) {
+                            JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                        }
+                    }
+                } else {
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(GAME_URL + "/remove?gameId=" + game.getId()))
+                            .build();
+                    try {
+                        httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                        dispose();
+                    } catch (Exception exception) {
+                        JOptionPane.showMessageDialog(null, "Error: " + exception.getMessage());
+                    }
+                }
+            } else {
+                dispose();
+            }
+        });
+
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                GameSocket.disconnect();
+                ChatSocket.disconnect();
+                new Home(signedInUser.getUsername());
             }
         });
     }

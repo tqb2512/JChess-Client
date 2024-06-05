@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -17,6 +18,10 @@ public class Auth extends JFrame {
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     public Auth() {
+        this.setTitle("JChess Online");
+        setPreferredSize(new Dimension(280, 130));
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
         setContentPane(MainPanel);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

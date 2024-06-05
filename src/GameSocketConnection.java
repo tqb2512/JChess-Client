@@ -48,7 +48,18 @@ public class GameSocketConnection {
             gameForm.player2Label.setText(game.getPlayer2() != null ? game.getPlayer2().getUsername() : "Waiting for player 2");
             gameForm.turnLabel.setText(game.getCurrentPlayer() != null ? game.getCurrentPlayer().getUsername() + "'s turn" : "Game has not started yet");
             if (game.getStatus() == GameStatus.FINISHED) {
-                JOptionPane.showMessageDialog(null, "Game Over");
+                Object[] options = {"Back"};
+                int n = JOptionPane.showOptionDialog(null,
+                        game.getCurrentPlayer().getUsername().equals(game.getPlayer1().getUsername()) ? game.getPlayer2().getUsername() + " wins!" : game.getPlayer1().getUsername() + " wins!",
+                        "Game Over",
+                        JOptionPane.PLAIN_MESSAGE,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+                if (n == 0) {
+                    gameForm.dispose();
+                }
             }
         }
     }
