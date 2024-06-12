@@ -21,6 +21,7 @@ public class GameSocketConnection {
     private StompSession stompSession;
     public Game game;
     public GameForm gameForm;
+    private final String serverUrl = "https://jchess.onrender.com";
 
     public void connect() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(
@@ -30,7 +31,7 @@ public class GameSocketConnection {
 
         StompSessionHandler sessionHandler = new MyStompSessionHandler();
         try {
-            stompSession = stompClient.connect("http://localhost:8080/gameplay", sessionHandler).get();
+            stompSession = stompClient.connect(serverUrl + "/gameplay", sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

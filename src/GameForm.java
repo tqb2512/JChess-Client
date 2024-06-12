@@ -24,8 +24,9 @@ public class GameForm extends JFrame{
     private JButton leaveButton;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    final private String GAME_URL = "http://localhost:8080/game";
-    final private String CHAT_URL = "http://localhost:8080/chat";
+    private final String serverUrl = "https://jchess.onrender.com";
+    final private String GAME_URL = serverUrl + "/game";
+    final private String CHAT_URL = serverUrl + "http://localhost:8080/chat";
     public User signedInUser;
     final private Game game;
     private GameSocketConnection GameSocket;

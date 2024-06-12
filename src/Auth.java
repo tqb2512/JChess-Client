@@ -14,7 +14,8 @@ public class Auth extends JFrame {
     private JButton signupButton;
     private JPanel MainPanel;
 
-    String SERVER_URL = "http://localhost:8080/user";
+    private final String serverUrl = "https://jchess.onrender.com";
+    String USER_URL = serverUrl + "/user";
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     public Auth() {
@@ -32,7 +33,7 @@ public class Auth extends JFrame {
             String password = new String(passwordField.getPassword());
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVER_URL + "/signin?username=" + username + "&password=" + password))
+                    .uri(URI.create(USER_URL + "/signin?username=" + username + "&password=" + password))
                     .build();
 
             try {
@@ -52,7 +53,7 @@ public class Auth extends JFrame {
             String password = new String(passwordField.getPassword());
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVER_URL + "/signup?username=" + username + "&password=" + password))
+                    .uri(URI.create(USER_URL + "/signup?username=" + username + "&password=" + password))
                     .build();
 
             try {

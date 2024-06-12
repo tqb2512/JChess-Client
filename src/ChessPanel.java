@@ -20,7 +20,8 @@ public class ChessPanel extends JPanel implements Runnable {
     final int TILE_SIZE = 70;
     final int WIDTH = 8;
     final int HEIGHT = 8;
-    final String GAME_URL = "http://localhost:8080/game";
+    private final String serverUrl = "https://jchess.onrender.com";
+    final String GAME_URL = serverUrl + "/game";
 
     Mouse mouse = new Mouse();
     private final HttpClient httpClient = HttpClient.newHttpClient();

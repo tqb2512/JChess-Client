@@ -28,8 +28,9 @@ public class Home extends JFrame {
     private JButton refreshButton;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     final private String signedInUser;
-    String USER_URL = "http://localhost:8080/user";
-    String GAME_URL = "http://localhost:8080/game";
+    private final String serverUrl = "https://jchess.onrender.com";
+    String USER_URL = serverUrl + "/user";
+    String GAME_URL = serverUrl + "/game";
 
     public Home(String signedInUser) {
         this.signedInUser = signedInUser;
