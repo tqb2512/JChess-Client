@@ -2,7 +2,6 @@ package model.piece;
 
 import model.Board;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class King extends Piece {
@@ -17,8 +16,8 @@ public class King extends Piece {
 
         int[][] directions = {
                 {-1, -1}, {-1, 0}, {-1, 1},
-                {0, -1},           {0, 1},
-                {1, -1},  {1, 0},  {1, 1}
+                {0, -1}, {0, 1},
+                {1, -1}, {1, 0}, {1, 1}
         };
 
         for (int[] direction : directions) {

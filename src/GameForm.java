@@ -1,3 +1,4 @@
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.google.gson.Gson;
 import model.Game;
 import model.GameStatus;
@@ -12,33 +13,33 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-public class GameForm extends JFrame{
+public class GameForm extends JFrame {
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final String serverUrl = "http://localhost:8080";
+    final private String GAME_URL = serverUrl + "/game";
+    final private String CHAT_URL = serverUrl + "/chat";
+    final private Game game;
     public JLabel player1Label;
     public JLabel player2Label;
-    private JPanel boardPanel;
     public JTextPane chatPane;
+    public JLabel turnLabel;
+    public User signedInUser;
+    private JPanel boardPanel;
     private JTextField chatField;
     private JButton sendChatButton;
     private JPanel GamePanel;
-    public JLabel turnLabel;
     private JButton leaveButton;
-
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final String serverUrl = "https://jchess.onrender.com";
-    final private String GAME_URL = serverUrl + "/game";
-    final private String CHAT_URL = serverUrl + "/chat";
-    public User signedInUser;
-    final private Game game;
     private GameSocketConnection GameSocket;
     private ChatSocketConnection ChatSocket;
 
     public GameForm(Game game, User signedInUser) {
+        FlatIntelliJLaf.setup();
         connectToChatSocket(game);
         connectToGameSocket(game);
         this.setTitle("GameID: " + game.getId() + " - " + signedInUser.getUsername());
-        setPreferredSize(new Dimension(900, 660));
+        setPreferredSize(new Dimension(900, 680));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
+        setLocation(dim.width / 2 - this.getPreferredSize().width / 2, dim.height / 2 - this.getPreferredSize().height / 2);
         ChessPanel chessPanel = new ChessPanel(signedInUser, GameSocket);
         GridLayout gridLayout = new GridLayout(1, 2);
         boardPanel.setLayout(gridLayout);

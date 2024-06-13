@@ -1,4 +1,5 @@
 import adapter.PieceTypeAdapter;
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -11,33 +12,32 @@ import model.piece.Piece;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class Home extends JFrame {
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    final private String signedInUser;
+    private final String serverUrl = "http://localhost:8080";
+    String USER_URL = serverUrl + "/user";
+    String GAME_URL = serverUrl + "/game";
     private JPanel HomePanel;
     private JTable roomTable;
     private JButton createRoomButton;
     private JButton viewProfileButton;
-    private JButton joinRandomButton;
+    private JButton leaderboardButton;
     private JButton refreshButton;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-    final private String signedInUser;
-    private final String serverUrl = "https://jchess.onrender.com";
-    String USER_URL = serverUrl + "/user";
-    String GAME_URL = serverUrl + "/game";
 
     public Home(String signedInUser) {
+        FlatIntelliJLaf.setup();
         this.signedInUser = signedInUser;
         this.setTitle("Room List");
         setPreferredSize(new Dimension(500, 600));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
+        setLocation(dim.width / 2 - this.getPreferredSize().width / 2, dim.height / 2 - this.getPreferredSize().height / 2);
         setContentPane(HomePanel);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -120,8 +120,8 @@ public class Home extends JFrame {
             JOptionPane.showMessageDialog(null, "Username: " + user.getUsername() + "\nWins: " + user.getWins() + "\nLosses: " + user.getLosses());
         });
 
-        joinRandomButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(null, "Join Random");
+        leaderboardButton.addActionListener(e -> {
+            new Leaderboard(this);
         });
 
         refreshButton.addActionListener(e -> {
@@ -136,7 +136,8 @@ public class Home extends JFrame {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             Gson gson = new Gson();
-            java.lang.reflect.Type type = new TypeToken<Map<String, GameListResponse>>(){}.getType();
+            java.lang.reflect.Type type = new TypeToken<Map<String, GameListResponse>>() {
+            }.getType();
             Map<String, GameListResponse> gameList = gson.fromJson(response.body(), type);
             DefaultTableModel tableModel = new DefaultTableModel();
             tableModel.addColumn("Game ID");

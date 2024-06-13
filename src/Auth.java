@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.FlatIntelliJLaf;
+
 import javax.swing.*;
 import java.awt.*;
 import java.net.URI;
@@ -6,6 +8,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class Auth extends JFrame {
+    private final String serverUrl = "http://localhost:8080";
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    String USER_URL = serverUrl + "/user";
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton signinButton;
@@ -14,15 +19,12 @@ public class Auth extends JFrame {
     private JButton signupButton;
     private JPanel MainPanel;
 
-    private final String serverUrl = "https://jchess.onrender.com";
-    String USER_URL = serverUrl + "/user";
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-
     public Auth() {
+        FlatIntelliJLaf.setup();
         this.setTitle("JChess Online");
         setPreferredSize(new Dimension(280, 130));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
+        setLocation(dim.width / 2 - this.getPreferredSize().width / 2, dim.height / 2 - this.getPreferredSize().height / 2);
         setContentPane(MainPanel);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

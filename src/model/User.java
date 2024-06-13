@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class User {
     private String username;
-    private String password;
+    private transient String password;
     private int totalGames;
     private int wins;
     private int losses;

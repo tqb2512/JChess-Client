@@ -4,22 +4,23 @@ import lombok.Getter;
 import lombok.Setter;
 import model.piece.Piece;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 @Setter
 @Getter
 public class Game {
 
-    private String id;
     User player1;
     User player2;
     GameStatus status;
     Board board;
     User currentPlayer;
+    private String id;
+
     public Game() {
         this.board = new Board();
     }
+
     public Game(User player1) {
         this.player1 = player1;
         this.status = GameStatus.WAITING_FOR_PLAYER;

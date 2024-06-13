@@ -9,7 +9,6 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ public abstract class Piece {
     }
 
     public abstract ArrayList<int[][]> getValidMoves(int currentCol, int currentRow, Board board);
+
     public BufferedImage loadSVGImage(String path) {
         try {
             PNGTranscoder transcoder = new PNGTranscoder();

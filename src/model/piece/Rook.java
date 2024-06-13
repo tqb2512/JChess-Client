@@ -2,7 +2,6 @@ package model.piece;
 
 import model.Board;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Rook extends Piece {
@@ -10,6 +9,7 @@ public class Rook extends Piece {
         super("Rook", color);
         image = loadSVGImage(color.equals("white") ? "/pieces/w-rook.svg" : "/pieces/b-rook.svg");
     }
+
     @Override
     public ArrayList<int[][]> getValidMoves(int currentCol, int currentRow, Board board) {
         ArrayList<int[][]> validMoves = new ArrayList<>();

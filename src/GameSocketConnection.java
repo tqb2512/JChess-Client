@@ -18,10 +18,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class GameSocketConnection {
-    private StompSession stompSession;
+    private final String serverUrl = "http://localhost:8080";
     public Game game;
     public GameForm gameForm;
-    private final String serverUrl = "https://jchess.onrender.com";
+    private StompSession stompSession;
 
     public void connect() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(
@@ -75,6 +75,7 @@ public class GameSocketConnection {
         public void handleTransportError(StompSession session, Throwable exception) {
             System.out.println("Transport Error: " + exception.getMessage());
         }
+
         @Override
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
             session.subscribe("/topic/game/" + game.getId(), new StompFrameHandler() {

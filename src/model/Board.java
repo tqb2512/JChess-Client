@@ -6,6 +6,7 @@ import model.piece.*;
 @Getter
 public class Board {
     private final Square[][] squares;
+
     public Board() {
         squares = new Square[8][8];
         for (int col = 0; col < 8; col++) {

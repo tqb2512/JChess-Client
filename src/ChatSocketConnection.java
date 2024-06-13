@@ -1,10 +1,6 @@
-import adapter.PieceTypeAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dto.ChatMessage;
 import model.Game;
-import model.piece.Piece;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -14,14 +10,13 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class ChatSocketConnection {
-    private StompSession stompSession;
+    private final String serverUrl = "http://localhost:8080";
     public Game game;
     public GameForm gameForm;
-    private final String serverUrl = "https://jchess.onrender.com";
+    private StompSession stompSession;
 
     public void connect() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(
@@ -59,6 +54,7 @@ public class ChatSocketConnection {
         public void handleTransportError(StompSession session, Throwable exception) {
             System.out.println("Transport Error: " + exception.getMessage());
         }
+
         @Override
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
             session.subscribe("/topic/chat/" + game.getId(), new StompFrameHandler() {

@@ -2,7 +2,6 @@ package model.piece;
 
 import model.Board;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Knight extends Piece {

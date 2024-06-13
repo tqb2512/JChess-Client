@@ -1,4 +1,3 @@
-import model.Game;
 import model.GameStatus;
 import model.Square;
 import model.User;
@@ -20,19 +19,16 @@ public class ChessPanel extends JPanel implements Runnable {
     final int TILE_SIZE = 70;
     final int WIDTH = 8;
     final int HEIGHT = 8;
-    private final String serverUrl = "https://jchess.onrender.com";
+    private final String serverUrl = "http://localhost:8080";
     final String GAME_URL = serverUrl + "/game";
-
-    Mouse mouse = new Mouse();
     private final HttpClient httpClient = HttpClient.newHttpClient();
-
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    Mouse mouse = new Mouse();
     User player;
     String color;
     Square selectedSquare;
     ArrayList<int[][]> validMoves;
-
     GameSocketConnection GameSocket;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public ChessPanel(User player, GameSocketConnection GameSocket) {
         setLayout(new BorderLayout());
@@ -97,7 +93,7 @@ public class ChessPanel extends JPanel implements Runnable {
             int row = mouse.y / TILE_SIZE;
             if (GameSocket.game.getStatus().equals(GameStatus.IN_PROGRESS)) {
                 if (GameSocket.game.getCurrentPlayer().getUsername().equals(player.getUsername())) {
-                    if (selectedSquare == null && GameSocket.game.getBoard().getPiece(col, row) != null && GameSocket.game.getBoard().getPiece(col, row).getColor().equals(color)){
+                    if (selectedSquare == null && GameSocket.game.getBoard().getPiece(col, row) != null && GameSocket.game.getBoard().getPiece(col, row).getColor().equals(color)) {
                         selectedSquare = GameSocket.game.getBoard().getSquare(col, row);
                         validMoves = GameSocket.game.getValidMoves(col, row);
                     } else if (selectedSquare != null && validMoves != null) {
