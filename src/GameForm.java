@@ -37,6 +37,7 @@ public class GameForm extends JFrame {
         connectToChatSocket(game);
         connectToGameSocket(game);
         this.setTitle("GameID: " + game.getId() + " - " + signedInUser.getUsername());
+        this.setResizable(false);
         setPreferredSize(new Dimension(900, 680));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width / 2 - this.getPreferredSize().width / 2, dim.height / 2 - this.getPreferredSize().height / 2);

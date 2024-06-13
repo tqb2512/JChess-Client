@@ -36,6 +36,7 @@ public class Home extends JFrame {
         this.signedInUser = signedInUser;
         this.setTitle("Room List");
         setPreferredSize(new Dimension(500, 600));
+        this.setResizable(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width / 2 - this.getPreferredSize().width / 2, dim.height / 2 - this.getPreferredSize().height / 2);
         setContentPane(HomePanel);
